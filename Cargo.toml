@@ -1,0 +1,15 @@
+[package]
+name = "rustplay"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+async-nats = "0.33.0"
+axum = "0.7.4"
+bytes = { version = "1.5", features = ["serde"] }
+futures = "0.3.28"
+serde = "1.0.196"
+serde_json = "1.0.113"
+thiserror = "1.0.57"
+tokio = { version = "1", features = ["full"] }
