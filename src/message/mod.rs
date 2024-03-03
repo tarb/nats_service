@@ -1,7 +1,4 @@
-mod server;
 mod handler;
+mod server;
 
-pub use {
-    server::*,
-    handler::*,
-};
+pub use {handler::*, server::*};

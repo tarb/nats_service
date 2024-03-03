@@ -1,14 +1,13 @@
+use super::Error;
 use crate::message::{FromMessage, IntoBytes};
 use async_nats::Message;
 use bytes::Bytes;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
-use super::Error;
-
 
 #[derive(Debug, Clone, Default)]
 pub struct Json<T>(pub T);
 
-impl<T, M> FromMessage<M> for Json<T>
+impl<T> FromMessage for Json<T>
 where
     T: DeserializeOwned,
 {
@@ -27,7 +26,7 @@ where
 }
 
 impl<T: Serialize> IntoBytes for Json<T> {
-    fn into_bytes(&self) -> Bytes {
+    fn into_bytes(self) -> Bytes {
         #[derive(Serialize)]
         #[serde(tag = "type", rename = "result")]
         struct Args<T> {
@@ -42,14 +41,13 @@ impl<T: Serialize> IntoBytes for Json<T> {
 }
 
 impl<T: IntoBytes, E: IntoBytes> IntoBytes for Result<T, E> {
-    fn into_bytes(&self) -> Bytes {
+    fn into_bytes(self) -> Bytes {
         match self {
             Ok(t) => t.into_bytes(),
             Err(e) => e.into_bytes(),
         }
     }
 }
-
 
 #[derive(Serialize)]
 #[serde(tag = "type", rename = "error")]
@@ -59,19 +57,21 @@ pub struct JsonError<T> {
 
 impl<T> JsonError<T> {
     pub fn new(v: T) -> Self {
-        Self{error:v}
+        Self { error: v }
     }
 }
 
 impl<T: Into<Error>> From<T> for JsonError<Error> {
     fn from(value: T) -> Self {
-        Self{ error: value.into() }
+        Self {
+            error: value.into(),
+        }
     }
 }
 
 impl IntoBytes for JsonError<Error> {
-    fn into_bytes(&self) -> Bytes {
-        const FALLBACK_ERR: &'static [u8] =
+    fn into_bytes(self) -> Bytes {
+        const FALLBACK_ERR: &[u8] =
             r#"{"type":"error", "error": { "message": "unknown", "errorType": "serialize" }}"#
                 .as_bytes();
 
