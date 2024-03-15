@@ -6,26 +6,22 @@ use std::sync::Arc;
 
 #[derive(Deserialize)]
 pub struct IncrementtInput {
-    amount: u64,
+    amount: i32,
 }
 
 #[derive(Serialize)]
 pub struct IncrementOutput {
-    count: u64,
+    count: i32,
 }
 
 pub async fn increment(
     state: Arc<AppState>,
     Json(inc): Json<IncrementtInput>,
 ) -> Result<Json<IncrementOutput>, JsonError<Error>> {
-    let count = {
-        let mut v = state.count.lock().await;
-        *v = v.checked_add(inc.amount).ok_or_else(|| Error::Overflow {
-            count: *v,
-            addition: inc.amount,
-        })?;
-        *v
-    };
+    let (count,): (i32,) = sqlx::query_as("INSERT INTO counts (integer_value) VALUES ((SELECT integer_value from counts ORDER BY created_at DESC LIMIT 1 ) + $1) RETURNING integer_value")
+        .bind(inc.amount)
+        .fetch_one(&state.database)
+        .await?;
 
     Ok(Json(IncrementOutput { count }))
 }

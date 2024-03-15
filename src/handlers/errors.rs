@@ -1,6 +1,5 @@
 use super::json::JsonError;
 use serde::{Serialize, Serializer};
-
 //
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -10,6 +9,8 @@ pub enum Error {
     Underflow { count: u64, subtract: u64 },
     #[error("increment above max value - count:{count}, adding:{addition}")]
     Overflow { count: u64, addition: u64 },
+    #[error("DB error : {0}")]
+    DBError(#[from] sqlx::Error),
 }
 
 impl Error {
@@ -18,6 +19,7 @@ impl Error {
             Error::Serialize(_) => "input",
             Error::Overflow { .. } => "overflow",
             Error::Underflow { .. } => "underflow",
+            Error::DBError { .. } => "db",
         }
     }
 }
