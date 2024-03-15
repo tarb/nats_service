@@ -10,10 +10,11 @@ pub struct CountOutput {
 }
 
 pub async fn count(state: Arc<AppState>) -> Result<Json<CountOutput>, JsonError<Error>> {
-    let (count,): (i32,) =
-        sqlx::query_as("SELECT integer_value FROM counts ORDER BY created_at DESC LIMIT 1")
-            .fetch_one(&state.database)
-            .await?;
+    let record = sqlx::query!("SELECT integer_value FROM counts ORDER BY created_at DESC LIMIT 1")
+        .fetch_one(&state.database)
+        .await?;
 
-    Ok(Json(CountOutput { count }))
+    Ok(Json(CountOutput {
+        count: record.integer_value.unwrap_or_default(),
+    }))
 }

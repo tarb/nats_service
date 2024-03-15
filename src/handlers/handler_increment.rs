@@ -18,10 +18,16 @@ pub async fn increment(
     state: Arc<AppState>,
     Json(inc): Json<IncrementtInput>,
 ) -> Result<Json<IncrementOutput>, JsonError<Error>> {
-    let (count,): (i32,) = sqlx::query_as("INSERT INTO counts (integer_value) VALUES ((SELECT integer_value from counts ORDER BY created_at DESC LIMIT 1 ) + $1) RETURNING integer_value")
-        .bind(inc.amount)
-        .fetch_one(&state.database)
-        .await?;
+    let record = sqlx::query!(
+        "INSERT INTO counts (integer_value)
+        VALUES ((SELECT integer_value from counts ORDER BY created_at DESC LIMIT 1 ) + $1)
+        RETURNING integer_value",
+        inc.amount
+    )
+    .fetch_one(&state.database)
+    .await?;
 
-    Ok(Json(IncrementOutput { count }))
+    Ok(Json(IncrementOutput {
+        count: record.integer_value.unwrap_or_default(),
+    }))
 }

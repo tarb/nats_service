@@ -6,7 +6,7 @@ use async_nats::ConnectError;
 use message::NatsServer;
 use std::sync::Arc;
 use tokio::signal::unix::{signal, SignalKind};
-use tokio::sync::Mutex;
+// use tokio::sync::Mutex;
 
 pub struct AppState {
     database: Pool<Postgres>,
@@ -44,5 +44,5 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         sig.recv().await;
     }
 
-    Ok(())
+    // Ok(())
 }
