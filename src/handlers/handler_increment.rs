@@ -1,5 +1,4 @@
-use super::json::{Json, JsonError};
-use super::Error;
+use super::{Error, json::{Json, JsonError}};
 use crate::AppState;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
@@ -20,7 +19,7 @@ pub async fn increment(
 ) -> Result<Json<IncrementOutput>, JsonError<Error>> {
     let record = sqlx::query!(
         "INSERT INTO counts (integer_value)
-        VALUES ((SELECT integer_value from counts ORDER BY created_at DESC LIMIT 1 ) + $1)
+        VALUES (coalesce((SELECT integer_value from counts ORDER BY created_at DESC LIMIT 1), 0) + $1)
         RETURNING integer_value",
         inc.amount
     )

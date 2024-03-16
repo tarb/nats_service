@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n    SELECT integer_value FROM counts \n    ORDER BY created_at DESC \n    LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "integer_value",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "5476551788f8b88d805f6ea3834efd27ee31fc48c63d9c75359d8aee378de619"
+}
