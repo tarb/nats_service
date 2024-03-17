@@ -11,6 +11,15 @@ pub trait IntoBytes: Sized {
     fn into_bytes(self) -> Bytes;
 }
 
+impl<T: IntoBytes, E: IntoBytes> IntoBytes for Result<T, E> {
+    fn into_bytes(self) -> Bytes {
+        match self {
+            Ok(t) => t.into_bytes(),
+            Err(e) => e.into_bytes(),
+        }
+    }
+}
+
 pub trait Handler<P, S> {
     fn call(self, message: &Message, state: S) -> impl Send + Future<Output = Bytes>;
 }

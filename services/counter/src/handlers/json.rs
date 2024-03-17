@@ -1,7 +1,7 @@
 use super::Error;
-use crate::message::{FromMessage, IntoBytes};
 use async_nats::Message;
 use bytes::Bytes;
+use message::{FromMessage, IntoBytes};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 #[derive(Debug, Clone, Default)]
@@ -36,15 +36,6 @@ impl<T: Serialize> IntoBytes for Json<T> {
         match serde_json::to_vec(&Args { data: &self.0 }) {
             Ok(v) => bytes::Bytes::from(v),
             Err(e) => JsonError::new(Error::from(e)).into_bytes(),
-        }
-    }
-}
-
-impl<T: IntoBytes, E: IntoBytes> IntoBytes for Result<T, E> {
-    fn into_bytes(self) -> Bytes {
-        match self {
-            Ok(t) => t.into_bytes(),
-            Err(e) => e.into_bytes(),
         }
     }
 }

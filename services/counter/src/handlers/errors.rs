@@ -1,3 +1,5 @@
+use std::convert::Infallible;
+
 use serde::{Serialize, Serializer};
 //
 #[derive(thiserror::Error, Debug)]
@@ -10,6 +12,8 @@ pub enum Error {
     // Underflow { count: u64, subtract: u64 },
     // #[error("increment above max value - count:{count}, adding:{addition}")]
     // Overflow { count: u64, addition: u64 },
+    #[error("infallible")]
+    Infallible(#[from] Infallible),
 }
 
 impl Error {
@@ -17,6 +21,7 @@ impl Error {
         match self {
             Error::Serialize(_) => "input",
             Error::DBError { .. } => "db",
+            Error::Infallible(_) => unreachable!(),
             // Error::Overflow { .. } => "overflow",
             // Error::Underflow { .. } => "underflow",
         }
