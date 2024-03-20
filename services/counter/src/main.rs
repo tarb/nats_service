@@ -9,6 +9,12 @@ use tokio::signal::unix::{signal, SignalKind};
 const DATABASE_URL: &str = env!("DATABASE_URL");
 const NATS_URL: &str = env!("NATS_URL");
 
+// might be easier to use state here if we instead used a trait object
+// then the handlers wont need to juggle the generic type
+// pub struct AppState {
+//     repo: Box<dyn repo::Repository>,
+// }
+
 pub struct AppState<R: repo::Repository> {
     repo: R,
 }
