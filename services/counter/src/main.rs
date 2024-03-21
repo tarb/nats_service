@@ -21,14 +21,14 @@ pub struct AppState<R: repo::Repository> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let database: Pool<Postgres> = postgres::PgPoolOptions::new()
-        .max_connections(30)
-        .connect(DATABASE_URL)
-        .await?;
-    sqlx::migrate!().run(&database).await?;
-    let repo = repo::Postgres::new(database);
+    // let database: Pool<Postgres> = postgres::PgPoolOptions::new()
+    //     .max_connections(30)
+    //     .connect(DATABASE_URL)
+    //     .await?;
+    // sqlx::migrate!().run(&database).await?;
+    // let repo = repo::Postgres::new(database);
 
-    // let repo = repo::MemoryRepository::new();
+    let repo = repo::Memory::new();
 
     let client = async_nats::connect(NATS_URL).await?;
 
